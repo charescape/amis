@@ -257,6 +257,11 @@ export interface SchemaApiObject {
     indices?: boolean;
     allowDots?: boolean;
   };
+
+  /**
+   * 配置此项可以对接口返回结果进行预处理
+   */
+  fetcherResultOverride?: string,
 }
 
 export type SchemaApi = string | SchemaApiObject;

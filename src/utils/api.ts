@@ -146,8 +146,15 @@ function str2function(
   }
 }
 
-function responseAdaptor(ret: fetcherResult) {
-  const data = ret.data;
+function responseAdaptor(ret: fetcherResult, api: ApiObject) {
+  let data: any = ret.data;
+
+  if (api.fetcherResultOverride != null) {
+    const fetcherResultOverride = str2function(api.fetcherResultOverride, 'fetcherResult') as any;
+    if (fetcherResultOverride !== null) {
+      data = fetcherResultOverride(ret);
+    }
+  }
 
   if (!data) {
     throw new Error('Response is empty!');
@@ -221,8 +228,8 @@ export function wrapAdaptor(promise: Promise<fetcherResult>, api: ApiObject) {
           ...response,
           data: adaptor((response as any).data, response, api)
         }))
-        .then(responseAdaptor)
-    : promise.then(responseAdaptor);
+        .then(fetcherResult => responseAdaptor(fetcherResult, api))
+    : promise.then(fetcherResult => responseAdaptor(fetcherResult, api));
 }
 
 export function isApiOutdated(
